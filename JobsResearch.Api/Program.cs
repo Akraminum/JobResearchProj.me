@@ -1,26 +1,27 @@
 using JobResearch.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+#region init
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(cfg =>
+    {
+        cfg.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+builder.Services.AddDbContext<ApplicationContext>(opt =>
+                opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+#endregion
 
 
-
-builder.Services.AddDbContext<ApplicationContext>(opt => 
-            opt.UseSqlServer(
-                "Server=.; Database = Job_Research_Db ; User Id=sa;Password=123456; Trusted_Connection=True; TrustServerCertificate=True; MultipleActiveResultSets=True;"
-                ));
-
-
-
-
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+#region Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+#endregion
 
 var app = builder.Build();
 
